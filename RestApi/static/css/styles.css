@@ -1,0 +1,110 @@
+/* === GLOBAL STYLES === */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+    background: url("/static/images/dashboardbg.jpg") no-repeat center center fixed;
+    background-size: cover;
+}
+
+/* === DARK OVERLAY === */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 1; /* Ensure it's below content */
+}
+
+/* === DASHBOARD & LOGIN STYLES === */
+.container, .login-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    z-index: 2; /* Ensure it's above the overlay */
+}
+
+/* === BUTTON STYLES === */
+button {
+    position: relative; /* Ensures buttons are clickable */
+    z-index: 3; /* Makes sure buttons are above all layers */
+    padding: 12px 20px;
+    font-size: 18px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.dashboard-button, .login-button {
+    background-color: #8B4513;
+    color: white;
+}
+
+.dashboard-button:hover, .login-button:hover {
+    background-color: #5a2d0c;
+    transform: scale(1.05);
+}
+
+.back-button {
+    margin-top: 10px;
+    background-color: #444;
+    color: white;
+}
+
+.back-button:hover {
+    background-color: #222;
+}
+
+/* === LOGIN PAGE STYLES === */
+.login-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+}
+
+/* Left Image */
+.image-container img {
+    width: 300px;
+    height: auto;
+    border-radius: 15px;
+}
+
+/* Right Side */
+.login-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 3; /* Ensure inputs and buttons are above everything */
+}
+
+.login-box h2 {
+    font-size: 24px;
+    margin-bottom: 15px;
+    color: white;
+}
+
+.login-box input {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.login-box button {
+    width: 100%;
+    padding: 12px;
+}

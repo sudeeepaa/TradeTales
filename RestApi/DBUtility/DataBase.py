@@ -4,9 +4,9 @@ from psycopg2.extras import RealDictCursor
 
 class Database:
     DB_CONFIG = {
-        'dbname': 'Amazon',
+        'dbname': 'tradetales',
         'user': 'admin',
-        'password': '#welcome123',
+        'password': 'admin123',
         'host': 'localhost'
     }
 

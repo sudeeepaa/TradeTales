@@ -1,5 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 import psycopg2
+from psycopg2.extras import RealDictCursor
+import bcrypt
 
 app = Flask(__name__)
 
@@ -12,46 +14,65 @@ DB_PORT = "5432"
 
 # Function to get DB connection
 def get_db_connection():
-    return psycopg2.connect(
-        dbname=DB_NAME,
-        user=DB_USER,
-        password=DB_PASSWORD,
-        host=DB_HOST,
-        port=DB_PORT
-    )
+    try:
+        conn = psycopg2.connect(
+            dbname=DB_NAME,
+            user=DB_USER,
+            password=DB_PASSWORD,
+            host=DB_HOST,
+            port=DB_PORT,
+            cursor_factory=RealDictCursor
+        )
+        print("✅ Connected to Database")
+        return conn
+    except Exception as e:
+        print(f"❌ Database connection failed: {e}")
+        return None
+
+# Check database connection at startup
+db_conn = get_db_connection()
+if db_conn:
+    db_conn.close()
 
 @app.route("/")
 def home():
-    return render_template("login.html")  # Renders login page
+    return render_template("dashboard.html")  # Load dashboard first
+
+@app.route("/dashboard")
+def dashboard():
+    return render_template("dashboard.html")
+
+@app.route("/login")
+def login_page():
+    return render_template("login.html")  # Redirects to login page
 
 @app.route("/login", methods=["POST"])
 def login():
-    username = request.form["username"]
-    password = request.form["password"]
+    try:
+        data = request.json
+        username = data.get("username")
+        password = data.get("password")
 
-    conn = get_db_connection()
-    cursor = conn.cursor()
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({"message": "Database connection failed", "status": "error"}), 500
 
-    # Query to get the user by username
-    cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
-    user = cursor.fetchone()
+        cursor = conn.cursor()
+        cursor.execute("SELECT username, password FROM users WHERE username = %s", (username,))
+        user = cursor.fetchone()
+        conn.close()
 
-    conn.close()
+        if not user:
+            return jsonify({"message": "User not found!", "status": "error"}), 404
 
-    if user:
-        # Check if the plain text password matches the stored password
-        if user[3] == password:  # user[3] corresponds to the stored password (plain text)
-            return "Login Successful!"
-        else:
-            return "Invalid Credentials! Try Again."
-    else:
-        return "User not found! Try Again."
+        stored_password = user["password"]  # Directly fetch password
+
+        if password == stored_password:  # Compare directly
+            return jsonify({"message": "Login Successful!", "status": "success"}), 200
+
+        return jsonify({"message": "Invalid Credentials!", "status": "error"}), 401
+    except Exception as e:
+        return jsonify({"message": f"Error: {str(e)}", "status": "error"}), 500
 
 if __name__ == "__main__":
-    print("Connecting to the database...")
-    conn = get_db_connection()
-    if conn:
-        print("Database connected successfully!")
-    else:
-        print("Database connection failed!")
     app.run(debug=True)
