@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ book.title }}</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <script>
+        async function addToWishlist(bookId) {
+            if (!bookId) {
+                alert("Invalid book ID.");
+                return;
+            }
+            try {
+                const response = await fetch(`/wishlist/add/${bookId}`, {
+                    method: "POST",
+                });
+                if (response.ok) {
+                    // Show popup message
+                    const popup = document.createElement("div");
+                    popup.className = "popup";
+                    popup.innerText = "Added to wishlist!";
+                    document.body.appendChild(popup);
+
+                    // Remove popup after 3 seconds
+                    setTimeout(() => {
+                        popup.remove();
+                    }, 3000);
+                } else {
+                    alert("Failed to add to wishlist.");
+                }
+            } catch (error) {
+                console.error("Error adding to wishlist:", error);
+            }
+        }
+    </script>
+    <style>
+        .popup {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #28a745;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            animation: fadeIn 0.5s ease, fadeOut 0.5s ease 2.5s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+        }
+
+        .book-image {
+            width: 200px;
+            height: 300px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>{{ book.title }}</h1>
+        <img src="/static/{{ book.cover_image }}" alt="{{ book.title }}" class="book-image">
+        <p><strong>Author:</strong> {{ book.author }}</p>
+        <p><strong>Genre:</strong> {{ book.genre }}</p>
+        <p><strong>Description:</strong> {{ book.description }}</p>
+        <p><strong>Condition:</strong> {{ book.condition }}</p>
+
+        <!-- Add to Wishlist Button -->
+        <button onclick="addToWishlist('{{ book.book_id }}')" class="btn btn-primary">Add to Wishlist</button>
+
+        <!-- Back to Dashboard -->
+        <a href="/" class="btn btn-secondary">Back to Dashboard</a>
+    </div>
+</body>
+</html>

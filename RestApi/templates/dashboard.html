@@ -1,19 +1,117 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - TradeTales</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-</head>
-<body class="dashboard-bg">
-    <div class="overlay"></div>
+{% extends "base.html" %}
 
-    <div class="container">
-        <h1>Welcome to TradeTales</h1>
-        <p>Your go-to platform for buying, selling, and exchanging books.</p>
-        <button class="dashboard-button" onclick="location.href='/login'">Go to Login</button>
+{% block title %}Dashboard - TradeTales{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4 text-center">Welcome, {{ username }}!</h1>
+
+
+    <!-- Browse Books Section -->
+    <div class="mt-5">
+        <h2>Browse Books</h2>
+        <div class="books-section">
+            {% for book in available_books %}
+                <div class="book-card">
+                    <img src="/static/{{ book[4] }}" alt="{{ book[0] }}" class="book-image">
+                    <div class="book-info">
+                        <h3>{{ book[0] }}</h3>
+                        <p><strong>Author:</strong> {{ book[1] }}</p>
+                        <p><strong>Genre:</strong> {{ book[2] }}</p>
+                        <p><strong>Price:</strong> ${{ book[7] }}</p>
+                        <a href="/book/{{ book[8] }}" class="btn btn-primary">View</a>
+                        <form id="buy-form-{{ book[8] }}" action="/buy/{{ book[8] }}" method="post" style="display: none;"></form>
+                        <button onclick="confirmPurchase('{{ book[0] }}', '{{ book[7] }}', '{{ book[8] }}')" class="btn btn-success">Buy</button>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
     </div>
-</body>
 
-</html>
+    <!-- Uploaded Books Section -->
+    <div class="mt-5">
+        <h2>Your Uploaded Books</h2>
+        {% if uploaded_books %}
+            <div class="books-section">
+                {% for book in uploaded_books %}
+                    <div class="book-card">
+                        <img src="/static/{{ book[4] }}" alt="{{ book[0] }}" class="book-image">
+                        <div class="book-info">
+                            <h3>{{ book[0] }}</h3>
+                            <p><strong>Author:</strong> {{ book[1] }}</p>
+                            <p><strong>Genre:</strong> {{ book[2] }}</p>
+                            <p><strong>Price:</strong> ${{ book[5] }}</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>You haven't uploaded any books yet.</p>
+        {% endif %}
+        <!-- Sell a Book Button -->
+        <a href="/sell-book" class="btn btn-success mt-3">Sell a Book</a>
+    </div>
+
+    <!-- Wishlist Section -->
+    <div class="mt-5">
+        <h2>Your Wishlist</h2>
+        {% if wishlist_books %}
+            <div class="books-section">
+                {% for book in wishlist_books %}
+                    <div class="book-card">
+                        <img src="/static/{{ book[4] }}" alt="{{ book[0] }}" class="book-image">
+                        <div class="book-info">
+                            <h3>{{ book[0] }}</h3>
+                            <p><strong>Author:</strong> {{ book[1] }}</p>
+                            <p><strong>Genre:</strong> {{ book[2] }}</p>
+                            <a href="/book/{{ book[5] }}" class="btn btn-primary">View</a>
+                            <form action="/wishlist/remove/{{ book[5] }}" method="post" style="display:inline;">
+                                <button type="submit" class="btn btn-danger">Remove</button>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>Your wishlist is empty.</p>
+        {% endif %}
+    </div>
+
+    <!-- Past Transactions Section -->
+    <div class="mt-5">
+        <h2>Your Past Transactions</h2>
+        {% if transactions %}
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Book Title</th>
+                        <th>Price</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for transaction in transactions %}
+                        <tr>
+                            <td>{{ transaction[0] }}</td>
+                            <td>{{ transaction[1] }}</td>
+                            <td>{{ transaction[2] }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>You have no past transactions.</p>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    function confirmPurchase(title, price, bookId) {
+        const confirmation = confirm(`Are you sure you want to purchase "${title}" for $${price}?`);
+        if (confirmation) {
+            // Submit the hidden form for the selected book
+            document.getElementById(`buy-form-${bookId}`).submit();
+        }
+    }
+</script>
+{% endblock %}

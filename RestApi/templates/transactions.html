@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Transactions - TradeTales</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    {% extends "base.html" %}
+
+    {% block title %}Transactions{% endblock %}
+
+    {% block content %}
+    <div class="container">
+        <h1>Your Past Transactions</h1>
+        {% if transactions %}
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Transaction ID</th>
+                        <th>Book Title</th>
+                        <th>Price</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for transaction in transactions %}
+                        <tr>
+                            <td>{{ transaction[0] }}</td> <!-- Transaction ID -->
+                            <td>{{ transaction[1] }}</td> <!-- Book Title -->
+                            <td>${{ transaction[2] }}</td> <!-- Price -->
+                            <td>{{ transaction[3] }}</td> <!-- Date -->
+                            <td>{{ transaction[4] }}</td> <!-- Status -->
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>You have no past transactions.</p>
+        {% endif %}
+        <a href="/" class="btn btn-primary">Back to Dashboard</a>
+    </div>
+    {% endblock %}
+</body>
+</html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Book - Admin Panel</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Add a New Book</h2>
+        {% if message %}
+            <div class="popup">{{ message }}</div>
+        {% endif %}
+        <form method="post" enctype="multipart/form-data">
+            <input type="text" name="title" placeholder="Book Title" required>
+            <input type="text" name="author" placeholder="Author" required>
+            <input type="text" name="genre" placeholder="Genre" required>
+            <textarea name="description" placeholder="Description" required></textarea>
+            <input type="text" name="condition" placeholder="Condition (e.g., New, Used, Like New)" required> <!-- New field -->
+            <input type="file" name="cover_image" required>
+            <button type="submit">Add Book</button>
+        </form>
+        <a href="/admin">⬅ Back to Admin Dashboard</a>
+    </div>
+</body>
+</html>
