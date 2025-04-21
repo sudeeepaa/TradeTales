@@ -10,7 +10,7 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'sh 'docker build -t tradetales-app -f RestApi/Dockerfile RestApi'
+                sh 'docker build -t tradetales-app -f RestApi/Dockerfile RestApi'
             }
         }
 
