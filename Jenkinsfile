@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    environment {
+        APP_DIR = 'RestApi'
+    }
+
     stages {
         stage('Checkout Code') {
             steps {
@@ -8,15 +12,19 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Install Dependencies') {
             steps {
-                sh 'docker build -t tradetales-app -f RestApi/Dockerfile RestApi'
+                dir("${env.APP_DIR}") {
+                    sh 'pip install -r requirements.txt'
+                }
             }
         }
 
-        stage('Run TradeTales Container') {
+        stage('Run TradeTales Flask App') {
             steps {
-                sh 'docker run -d --name tradetales-container tradetales-app'
+                dir("${env.APP_DIR}") {
+                    sh 'nohup python main.py &'
+                }
             }
         }
     }
