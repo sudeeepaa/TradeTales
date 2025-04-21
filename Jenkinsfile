@@ -15,7 +15,7 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 dir("${env.APP_DIR}") {
-                    sh 'pip install -r requirements.txt'
+                    sh 'python -m pip install -r requirements.txt'
                 }
             }
         }
