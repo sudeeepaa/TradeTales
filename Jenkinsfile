@@ -8,15 +8,15 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies') {
+        stage('Build Docker Image') {
             steps {
-                sh 'pip install -r requirements.txt'
+                sh 'sh 'docker build -t tradetales-app -f RestApi/Dockerfile RestApi'
             }
         }
 
-        stage('Run TradeTales App') {
+        stage('Run TradeTales Container') {
             steps {
-                sh 'nohup python main.py &'
+                sh 'docker run -d --name tradetales-container tradetales-app'
             }
         }
     }
