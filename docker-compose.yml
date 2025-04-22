@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+    env_file:
+      - .env
+    ports:
+      - "8001:8000"  # Change the host port to 8001 for the app service
+    volumes:
+      - .:/app
+    command: ["python", "RestApi/main.py"]
+
+  web:
+    build: .
+    command: python RestApi/main.py
+    ports:
+      - "8000:8000"  # Expose the web service on port 8000
+    environment:
+      - FASTAPI_ENV=development
+      - DB_NAME=tradetales
+      - DB_USER=myuser
+      - DB_PASSWORD=mypassword
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DATABASE_URL=postgresql://myuser:mypassword@db:5432/tradetales
+      - SECRET_KEY=your_secret_key
+      - DEBUG=True
+    volumes:
+      - .:/app
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    env_file:
+      - .env
+
+  db:
+    image: postgres:13
+    restart: always
+    environment:
+      - POSTGRES_DB=tradetales
+      - POSTGRES_USER=myuser
+      - POSTGRES_PASSWORD=mypassword
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"  # Change the host port to 5433
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U myuser -d tradetales"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    env_file:
+      - .env
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=sudeepa.santhanam@outlook.com  # Replace with your email
+      - PGADMIN_DEFAULT_PASSWORD=ADMIN  # Replace with a secure password
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+    restart: unless-stopped
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  postgres_data:
