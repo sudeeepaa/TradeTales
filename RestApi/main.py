@@ -94,7 +94,7 @@ def login_post(request: Request, username: str = Form(...), password: str = Form
 
         if user and user[0] == password:
             request.session['user'] = username
-            return RedirectResponse(url="/", status_code=302)
+            return RedirectResponse(url="/?message=Login successful!", status_code=302)
 
         return templates.TemplateResponse("login.html", {"request": request, "message": "Invalid username or password"})
     except Exception as e:
@@ -135,12 +135,9 @@ def admin_login_get(request: Request):
 
 @app.post("/admin-login", response_class=HTMLResponse)
 def admin_login_post(request: Request, username: str = Form(...), password: str = Form(...)):
-    print(f"Attempting login with username: {username}, password: {password}")
     if username == "admin" and password == "admin123":
         request.session['user'] = "admin"
-        print("Admin login successful. Redirecting to /admin")
-        return RedirectResponse(url="/admin", status_code=302)
-    print("Invalid admin credentials")
+        return RedirectResponse(url="/admin?message=Admin login successful!", status_code=302)
     return templates.TemplateResponse("admin_login.html", {"request": request, "message": "Invalid admin credentials"})
 
 
@@ -197,7 +194,7 @@ def admin_dashboard(request: Request):
 @app.get("/logout")
 def logout(request: Request):
     request.session.clear()
-    return RedirectResponse(url="/", status_code=302)
+    return RedirectResponse(url="/?message=Logout successful!", status_code=302)
 
 
 @app.get("/book/{book_id}", response_class=HTMLResponse)
@@ -332,7 +329,6 @@ def add_to_wishlist(request: Request, book_id: int):
     if not username:
         return RedirectResponse(url="/login", status_code=302)
 
-    # Get the user's ID
     cursor.execute("SELECT user_id FROM users WHERE username = %s", (username,))
     user = cursor.fetchone()
     if not user:
@@ -341,10 +337,9 @@ def add_to_wishlist(request: Request, book_id: int):
     user_id = user[0]
 
     try:
-        # Add the book to the user's wishlist
         cursor.execute("INSERT INTO wishlist (user_id, book_id) VALUES (%s, %s)", (user_id, book_id))
         conn.commit()
-        return RedirectResponse(url=f"/book/{book_id}?message=Added to wishlist!", status_code=302)
+        return RedirectResponse(url=f"/book/{book_id}?message=Book added to wishlist!", status_code=302)
     except psycopg2.IntegrityError:
         conn.rollback()
         return RedirectResponse(url=f"/book/{book_id}?message=Book already in wishlist!", status_code=302)
@@ -360,7 +355,6 @@ def remove_from_wishlist(request: Request, book_id: int):
     if not username:
         return RedirectResponse(url="/login", status_code=302)
 
-    # Get the user's ID
     cursor.execute("SELECT user_id FROM users WHERE username = %s", (username,))
     user = cursor.fetchone()
     if not user:
@@ -369,10 +363,9 @@ def remove_from_wishlist(request: Request, book_id: int):
     user_id = user[0]
 
     try:
-        # Remove the book from the user's wishlist
         cursor.execute("DELETE FROM wishlist WHERE user_id = %s AND book_id = %s", (user_id, book_id))
         conn.commit()
-        return RedirectResponse(url="/wishlist", status_code=302)
+        return RedirectResponse(url="/wishlist?message=Book removed from wishlist!", status_code=302)
     except Exception as e:
         conn.rollback()
         return templates.TemplateResponse("wishlist.html", {
